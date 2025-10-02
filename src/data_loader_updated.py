@@ -202,9 +202,9 @@ class DataLoader:
         logger.info(f"Loaded demographics for {len(df)} participants")
         return df
     
-    def load_microbiome(self, max_features: int = 500) -> pd.DataFrame:
+    def load_microbiome(self, max_features: int = 1000) -> pd.DataFrame:
         """
-        Load microbiome composition data from microbes.csv with memory optimization.
+        Load microbiome composition data from microbes.csv with memory optimization for Colab.
         Contains abundance/presence data for thousands of microbial species.
         
         Expected structure:
@@ -212,7 +212,7 @@ class DataLoader:
         - Thousands of columns for different bacterial species (binary or abundance values)
         
         Args:
-            max_features: Maximum number of most prevalent microbial features to keep (default: 500)
+            max_features: Maximum number of most prevalent microbial features to keep (default: 1000 for Colab)
         
         Returns:
             DataFrame with microbiome data for each participant
@@ -229,7 +229,7 @@ class DataLoader:
         if 'subject' in df.columns:
             df = df.rename(columns={'subject': 'participant_id'})
         
-        # Feature selection for microbiome data to reduce memory
+        # Feature selection for microbiome data to reduce memory (keep more features for Colab)
         microbiome_cols = [col for col in df.columns if col != 'participant_id']
         
         if len(microbiome_cols) > max_features:
@@ -306,7 +306,7 @@ class DataLoader:
             gc.collect()
         
         # Load and merge microbiome data (participant-level data with feature selection)
-        microbiome_df = self.load_microbiome(max_features=500)  # Limit to top 500 features
+        microbiome_df = self.load_microbiome(max_features=1000)  # Limit to top 1000 features for Colab
         if not microbiome_df.empty:
             merged_df = merged_df.merge(microbiome_df, on='participant_id', how='left')
             logger.info("Merged microbiome data")
