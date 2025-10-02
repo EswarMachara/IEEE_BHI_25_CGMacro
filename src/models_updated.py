@@ -23,6 +23,22 @@ from scipy import stats
 import warnings
 warnings.filterwarnings('ignore')
 
+# Check for XGBoost and LightGBM availability
+XGBOOST_AVAILABLE = True
+LIGHTGBM_AVAILABLE = True
+
+try:
+    import xgboost as xgb
+except ImportError:
+    XGBOOST_AVAILABLE = False
+    print("XGBoost not available. XGBoost models will be skipped.")
+    
+try:
+    import lightgbm as lgb
+except ImportError:
+    LIGHTGBM_AVAILABLE = False
+    print("LightGBM not available. LightGBM models will be skipped.")
+
 # Try importing deep learning libraries
 try:
     import tensorflow as tf

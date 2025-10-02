@@ -52,9 +52,9 @@ class CGMacrosPipeline:
         self.config = self._load_config(config_path)
         self.random_state = self.config.get('random_state', 42)
         
-        # Initialize components
+        # Initialize components with memory optimization
         self.data_loader = DataLoader()
-        self.feature_engineer = FeatureEngineer()
+        self.feature_engineer = FeatureEngineer(memory_efficient=True)
         self.model_trainer = ModelTrainer(random_state=self.random_state)
         self.evaluator = ModelEvaluator(random_state=self.random_state)
         self.report_generator = EvaluationReport()

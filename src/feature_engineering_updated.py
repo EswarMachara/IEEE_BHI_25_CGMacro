@@ -18,12 +18,57 @@ warnings.filterwarnings('ignore')
 
 class FeatureEngineer:
     """
-    Feature engineering class for creating features from multimodal CGMacros data.
+    Feature engineering class for creating features from multimodal CGMacros data with memory optimization.
     """
     
-    def __init__(self):
+    def __init__(self, memory_efficient: bool = True):
         self.scalers = {}
         self.encoders = {}
+        self.memory_efficient = memory_efficient
+        
+    def _optimize_dtypes(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Optimize DataFrame dtypes to reduce memory usage.
+        
+        Args:
+            df: DataFrame to optimize
+            
+        Returns:
+            DataFrame with optimized dtypes
+        """
+        if not self.memory_efficient:
+            return df
+            
+        df_optimized = df.copy()
+        
+        # Optimize numeric columns
+        for col in df_optimized.select_dtypes(include=[np.number]).columns:
+            if col in ['participant_id']:
+                # Keep participant_id as int for consistency
+                df_optimized[col] = df_optimized[col].astype('int16')
+            elif df_optimized[col].dtype == 'int64':
+                # Try to downcast integers
+                c_min = df_optimized[col].min()
+                c_max = df_optimized[col].max()
+                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+                    df_optimized[col] = df_optimized[col].astype(np.int8)
+                elif c_min > np.iinfo(np.int16).min and c_max < np.iinfo(np.int16).max:
+                    df_optimized[col] = df_optimized[col].astype(np.int16)
+                elif c_min > np.iinfo(np.int32).min and c_max < np.iinfo(np.int32).max:
+                    df_optimized[col] = df_optimized[col].astype(np.int32)
+            elif df_optimized[col].dtype == 'float64':
+                # Try to downcast floats
+                df_optimized[col] = pd.to_numeric(df_optimized[col], downcast='float')
+        
+        # Optimize object columns (strings)
+        for col in df_optimized.select_dtypes(include=['object']).columns:
+            if col not in ['Timestamp']:  # Skip timestamp column
+                num_unique_values = len(df_optimized[col].unique())
+                num_total_values = len(df_optimized[col])
+                if num_unique_values / num_total_values < 0.5:  # If less than 50% unique values
+                    df_optimized[col] = df_optimized[col].astype('category')
+        
+        return df_optimized
         
     def add_glucose_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -160,8 +205,16 @@ class FeatureEngineer:
         
         # Encode meal type if present
         if 'Meal Type' in df.columns:
-            # Fill missing meal types
-            df['Meal Type'] = df['Meal Type'].fillna('No Meal')
+            # Handle categorical data properly
+            if df['Meal Type'].dtype.name == 'category':
+                # Add 'No Meal' category if not already present
+                if 'No Meal' not in df['Meal Type'].cat.categories:
+                    df['Meal Type'] = df['Meal Type'].cat.add_categories(['No Meal'])
+                # Fill missing meal types
+                df['Meal Type'] = df['Meal Type'].fillna('No Meal')
+            else:
+                # Fill missing meal types for non-categorical data
+                df['Meal Type'] = df['Meal Type'].fillna('No Meal')
             
             # Create meal type dummies
             meal_dummies = pd.get_dummies(df['Meal Type'], prefix='meal_type')
@@ -251,7 +304,7 @@ class FeatureEngineer:
     
     def add_microbiome_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Process microbiome features.
+        Process microbiome features with memory optimization and categorical data handling.
         
         Args:
             df: DataFrame with microbiome data
@@ -266,8 +319,12 @@ class FeatureEngineer:
                        'METs', 'Meal Type', 'Carbs', 'Protein', 'Fat', 'Fiber', 'Amount Consumed',
                        'Image path', 'Age', 'Gender', 'BMI', 'A1c', 'Fasting GLU', 'Insulin']
         
-        microbiome_cols = [col for col in df.columns if col not in exclude_cols and 
-                          not col.endswith(('_mean', '_std', '_min', '_max', '_median', '_encoded', '_category'))]
+        # Also exclude previously created feature columns
+        exclude_cols.extend([col for col in df.columns if any(suffix in col for suffix in 
+                           ['_mean', '_std', '_min', '_max', '_median', '_encoded', '_category', 
+                            '_div', '_richness', '_abundance', '_present', '_zone', '_ratio'])])
+        
+        microbiome_cols = [col for col in df.columns if col not in exclude_cols]
         
         if not microbiome_cols:
             logger.warning("No microbiome columns identified")
@@ -275,14 +332,29 @@ class FeatureEngineer:
         
         df = df.copy()
         
-        # Calculate microbiome diversity metrics
+        # Ensure microbiome data is numeric and handle categorical columns
+        microbiome_data = df[microbiome_cols].copy()
+        
+        # Convert categorical columns to numeric if they exist
+        for col in microbiome_cols:
+            if df[col].dtype == 'category':
+                # Convert categorical to numeric
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+            elif df[col].dtype == 'object':
+                # Try to convert object columns to numeric
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+        
+        # Recalculate microbiome_data after conversion
         microbiome_data = df[microbiome_cols].fillna(0)
         
         # Alpha diversity (Shannon diversity index)
         def shannon_diversity(row):
-            proportions = row / row.sum() if row.sum() > 0 else row
-            proportions = proportions[proportions > 0]
-            return -np.sum(proportions * np.log(proportions)) if len(proportions) > 0 else 0
+            try:
+                proportions = row / row.sum() if row.sum() > 0 else row
+                proportions = proportions[proportions > 0]
+                return -np.sum(proportions * np.log(proportions)) if len(proportions) > 0 else 0
+            except:
+                return 0
         
         df['microbiome_shannon_diversity'] = microbiome_data.apply(shannon_diversity, axis=1)
         
@@ -292,7 +364,21 @@ class FeatureEngineer:
         # Total abundance
         df['microbiome_total_abundance'] = microbiome_data.sum(axis=1)
         
-        # Dominant species features
+        # Dominant species features (only if we have enough species)
+        if len(microbiome_cols) > 10:
+            # Select top 10 most prevalent species across all participants
+            try:
+                species_prevalence = (microbiome_data > 0).sum().sort_values(ascending=False)
+                top_species = species_prevalence.head(10).index.tolist()
+                
+                for species in top_species:
+                    if species in df.columns:  # Make sure column still exists
+                        df[f'microbiome_{species}_present'] = (df[species] > 0).astype(int)
+            except Exception as e:
+                logger.warning(f"Could not create dominant species features: {e}")
+        
+        logger.info(f"Added microbiome features from {len(microbiome_cols)} species")
+        return df
         if len(microbiome_cols) > 10:
             # Select top 10 most prevalent species across all participants
             species_prevalence = (microbiome_data > 0).sum().sort_values(ascending=False)
@@ -384,7 +470,7 @@ class FeatureEngineer:
     
     def engineer_features(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Apply all feature engineering steps.
+        Apply all feature engineering steps with memory optimization.
         
         Args:
             df: Raw merged DataFrame
@@ -392,18 +478,51 @@ class FeatureEngineer:
         Returns:
             DataFrame with engineered features
         """
-        logger.info("Starting feature engineering...")
+        logger.info("Starting feature engineering with memory optimization...")
+        initial_memory = df.memory_usage(deep=True).sum() / 1024**2
+        logger.info(f"Initial memory usage: {initial_memory:.1f} MB")
         
-        # Apply all feature engineering steps
+        # Apply feature engineering steps sequentially with memory monitoring
         df = self.add_temporal_features(df)
-        df = self.add_glucose_features(df)
-        df = self.add_activity_features(df)
-        df = self.add_meal_features(df)
-        df = self.add_demographic_features(df)
-        df = self.add_microbiome_features(df)
-        df = self.add_gut_health_features(df)
+        if self.memory_efficient:
+            df = self._optimize_dtypes(df)
+            import gc
+            gc.collect()
         
+        df = self.add_glucose_features(df)
+        if self.memory_efficient:
+            df = self._optimize_dtypes(df)
+            gc.collect()
+        
+        df = self.add_activity_features(df)
+        if self.memory_efficient:
+            df = self._optimize_dtypes(df)
+            gc.collect()
+        
+        df = self.add_meal_features(df)
+        if self.memory_efficient:
+            df = self._optimize_dtypes(df)
+            gc.collect()
+        
+        df = self.add_demographic_features(df)
+        if self.memory_efficient:
+            df = self._optimize_dtypes(df)
+            gc.collect()
+        
+        df = self.add_microbiome_features(df)
+        if self.memory_efficient:
+            df = self._optimize_dtypes(df)
+            gc.collect()
+        
+        df = self.add_gut_health_features(df)
+        if self.memory_efficient:
+            df = self._optimize_dtypes(df)
+            gc.collect()
+        
+        final_memory = df.memory_usage(deep=True).sum() / 1024**2
         logger.info(f"Feature engineering completed. Final shape: {df.shape}")
+        logger.info(f"Final memory usage: {final_memory:.1f} MB")
+        
         return df
     
     def scale_features(self, df: pd.DataFrame, method: str = 'standard') -> pd.DataFrame:
