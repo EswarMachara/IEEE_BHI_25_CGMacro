@@ -999,15 +999,3 @@ class UltraOptimizedFeatureEngineer:
             logger.info(f"    💾 Feature optimization saved: {memory_saved:.1f} MB")
         
         return df
-
-
-# Create compatibility wrapper that extends the original class
-FeatureEngineer.engineer_features_ultra_optimized = UltraOptimizedFeatureEngineer.engineer_features_ultra_optimized
-FeatureEngineer._get_memory_usage = UltraOptimizedFeatureEngineer._get_memory_usage
-FeatureEngineer._get_available_memory = UltraOptimizedFeatureEngineer._get_available_memory
-FeatureEngineer.add_essential_temporal_features = UltraOptimizedFeatureEngineer.add_essential_temporal_features
-FeatureEngineer.add_essential_glucose_features = UltraOptimizedFeatureEngineer.add_essential_glucose_features
-FeatureEngineer.add_essential_activity_features = UltraOptimizedFeatureEngineer.add_essential_activity_features
-FeatureEngineer.add_essential_meal_features = UltraOptimizedFeatureEngineer.add_essential_meal_features
-FeatureEngineer._memory_safe_feature_creation = UltraOptimizedFeatureEngineer._memory_safe_feature_creation
-FeatureEngineer._ultra_optimize_new_features = UltraOptimizedFeatureEngineer._ultra_optimize_new_features
