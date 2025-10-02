@@ -1,198 +1,392 @@
-# CGMacros CCR Prediction - IEEE BHI 2025 Track 2
+# CGMacros CCR Prediction - IEEE BHI 2025 Track 2# CGMacros CCR Prediction - IEEE BHI 2025 Track 2
 
-A comprehensive machine learning solution for predicting Carbohydrate Caloric Ratio (CCR) from multimodal physiological and dietary data using the CGMacros dataset.
 
-## 🎯 Problem Statement
 
-The challenge is to predict the **Carbohydrate Caloric Ratio (CCR)** of meals consumed by participants using:
-- **Continuous Glucose Monitoring (CGM)** data (Libre and Dexcom sensors)
-- **Activity data** (heart rate, metabolic equivalents, calories)
-- **Demographic information** (age, gender, BMI, A1c levels)
-- **Microbiome data** (bacterial species abundance)
-- **Gut health measurements** (biomarkers and test scores)
+A comprehensive machine learning solution for predicting Carbohydrate Caloric Ratio (CCR) from multimodal physiological and dietary data using the CGMacros dataset.A comprehensive machine learning solution for predicting Carbohydrate Caloric Ratio (CCR) from multimodal physiological and dietary data using the CGMacros dataset.
 
-**CCR Formula**:
-```
-CCR = net_carbs / (net_carbs + protein + fat + fiber)
-```
 
-## 📊 Dataset Structure
 
-The CGMacros dataset contains multimodal data for 44 participants:
+## Problem Statement## 🎯 Problem Statement
 
-| Data Type | Source | Description |
-|-----------|--------|-------------|
-| **Time-series** | CGMacros_CSVs/ | Individual participant glucose, activity, and meal data |
-| **Demographics** | bio.csv | Age, gender, BMI, A1c levels |
-| **Microbiome** | microbes.csv | Bacterial species abundance data |
-| **Gut Health** | gut_health_test.csv | Gut health scores and biomarkers |
 
-## 🗂️ Repository Structure
 
-```
-IEEE_BHI_Track2/
-├── 📁 data/
-│   ├── raw/                         # Original dataset files
-│   │   ├── CGMacros_CSVs/          # 44 participant time-series files
-│   │   ├── bio.csv                 # Demographics (44 participants)
-│   │   ├── microbes.csv            # Microbiome data (44 samples)
-│   │   └── gut_health_test.csv     # Gut health scores (44 samples)
-│   └── processed/                   # Processed and merged data
-├── 📁 src/                         # Core implementation modules
-│   ├── data_loader_updated.py      # ✅ Data loading and merging
-│   ├── feature_engineering_updated.py # ✅ Comprehensive feature extraction
-│   ├── target_updated.py           # ✅ CCR computation and validation
-│   ├── models_updated.py           # ✅ Complete model implementations
-│   ├── evaluation_updated.py       # ✅ Participant-aware validation
-│   └── visualization.py            # Plotting and analysis utilities
-├── 📁 notebooks/                   # Interactive analysis notebooks
-│   ├── 01_data_exploration_updated.ipynb # ✅ Complete data analysis
-│   └── 02_model_training_complete.ipynb  # ✅ Full modeling workflow
-├── 📁 results/                     # Model outputs and reports
-├── 📁 models/                      # Saved trained models
-├── config.yaml                     # Configuration settings
-├── run_pipeline_updated.py         # ✅ Complete end-to-end pipeline
-└── requirements_updated.txt        # ✅ Updated dependencies
-```
+The challenge is to predict the **Carbohydrate Caloric Ratio (CCR)** of meals consumed by participants using:The challenge is to predict the **Carbohydrate Caloric Ratio (CCR)** of meals consumed by participants using:
 
-## 🚀 Quick Start
+- **Continuous Glucose Monitoring (CGM)** data (Libre and Dexcom sensors)- **Continuous Glucose Monitoring (CGM)** data (Libre and Dexcom sensors)
 
-### 1. Environment Setup
-```bash
-# Install dependencies
-pip install -r requirements_updated.txt
+- **Activity data** (heart rate, metabolic equivalents, calories)- **Activity data** (heart rate, metabolic equivalents, calories)
+
+- **Demographic information** (age, gender, BMI, A1c levels)- **Demographic information** (age, gender, BMI, A1c levels)
+
+- **Microbiome data** (bacterial species abundance)- **Microbiome data** (bacterial species abundance)
+
+- **Gut health measurements** (biomarkers and test scores)- **Gut health measurements** (biomarkers and test scores)
+
+
+
+**CCR Formula**:**CCR Formula**:
+
+``````
+
+CCR = net_carbs / (net_carbs + protein + fat + fiber)CCR = net_carbs / (net_carbs + protein + fat + fiber)
+
+``````
+
+
+
+## Dataset Structure## 📊 Dataset Structure
+
+
+
+The CGMacros dataset contains multimodal data for 45 participants:The CGMacros dataset contains multimodal data for 44 participants:
+
+
+
+| Data Type | Source | Description || Data Type | Source | Description |
+
+|-----------|--------|-------------||-----------|--------|-------------|
+
+| **Time-series** | CGMacros_CSVs/ | Individual participant glucose, activity, and meal data || **Time-series** | CGMacros_CSVs/ | Individual participant glucose, activity, and meal data |
+
+| **Demographics** | bio.csv | Age, gender, BMI, A1c levels || **Demographics** | bio.csv | Age, gender, BMI, A1c levels |
+
+| **Microbiome** | microbes.csv | Bacterial species abundance data (1,979 features) || **Microbiome** | microbes.csv | Bacterial species abundance data |
+
+| **Gut Health** | gut_health_test.csv | Gut health scores and biomarkers || **Gut Health** | gut_health_test.csv | Gut health scores and biomarkers |
+
+
+
+## Repository Structure## 🗂️ Repository Structure
+
+
+
+``````
+
+IEEE_BHI_Track2/IEEE_BHI_Track2/
+
+├── data/├── 📁 data/
+
+│   ├── raw/                         # Original dataset files│   ├── raw/                         # Original dataset files
+
+│   │   ├── CGMacros_CSVs/          # 45 participant time-series files│   │   ├── CGMacros_CSVs/          # 44 participant time-series files
+
+│   │   ├── bio.csv                 # Demographics (45 participants)│   │   ├── bio.csv                 # Demographics (44 participants)
+
+│   │   ├── microbes.csv            # Microbiome data (45 samples, 1,979 features)│   │   ├── microbes.csv            # Microbiome data (44 samples)
+
+│   │   └── gut_health_test.csv     # Gut health scores (47 samples)│   │   └── gut_health_test.csv     # Gut health scores (44 samples)
+
+│   └── processed/                   # Processed and merged data│   └── processed/                   # Processed and merged data
+
+├── src/                            # Core implementation modules├── 📁 src/                         # Core implementation modules
+
+│   ├── data_loader_updated.py      # Data loading and merging│   ├── data_loader_updated.py      # ✅ Data loading and merging
+
+│   ├── feature_engineering_updated.py # Comprehensive feature extraction│   ├── feature_engineering_updated.py # ✅ Comprehensive feature extraction
+
+│   ├── target_updated.py           # CCR computation and validation│   ├── target_updated.py           # ✅ CCR computation and validation
+
+│   ├── models_updated.py           # Complete model implementations│   ├── models_updated.py           # ✅ Complete model implementations
+
+│   ├── evaluation_updated.py       # Participant-aware validation│   ├── evaluation_updated.py       # ✅ Participant-aware validation
+
+│   └── visualization.py            # Plotting and analysis utilities│   └── visualization.py            # Plotting and analysis utilities
+
+├── notebooks/                      # Interactive analysis notebooks├── 📁 notebooks/                   # Interactive analysis notebooks
+
+│   ├── 01_data_exploration_updated.ipynb # Complete data analysis│   ├── 01_data_exploration_updated.ipynb # ✅ Complete data analysis
+
+│   ├── 02_model_training_complete.ipynb  # Full modeling workflow│   └── 02_model_training_complete.ipynb  # ✅ Full modeling workflow
+
+│   └── 05_colab_optimized_execution.ipynb # Google Colab execution├── 📁 results/                     # Model outputs and reports
+
+├── results/                        # Model outputs and reports├── 📁 models/                      # Saved trained models
+
+├── models/                         # Saved trained models├── config.yaml                     # Configuration settings
+
+├── config.yaml                     # Configuration settings├── run_pipeline_updated.py         # ✅ Complete end-to-end pipeline
+
+└── run_pipeline_updated.py         # Complete end-to-end pipeline└── requirements_updated.txt        # ✅ Updated dependencies
+
+``````
+
+
+
+## Quick Start## 🚀 Quick Start
+
+
+
+### 1. Environment Setup### 1. Environment Setup
+
+```bash```bash
+
+# Clone repository# Install dependencies
+
+git clone https://github.com/EswarMachara/IEEE_BHI_25_CGMacro.gitpip install -r requirements_updated.txt
+
+cd IEEE_BHI_25_CGMacro
 
 # Or install specific versions
-pip install pandas>=1.3.0 scikit-learn>=1.0.0 xgboost>=1.5.0 tensorflow>=2.7.0
+
+# Install dependenciespip install pandas>=1.3.0 scikit-learn>=1.0.0 xgboost>=1.5.0 tensorflow>=2.7.0
+
+pip install pandas scikit-learn xgboost lightgbm numpy matplotlib seaborn psutil```
+
 ```
 
 ### 2. Complete Pipeline Execution
-```bash
-# Run the full end-to-end pipeline
-python run_pipeline_updated.py
+
+### 2. Local Execution```bash
+
+```bash# Run the full end-to-end pipeline
+
+# Run the complete pipelinepython run_pipeline_updated.py
+
+python run_pipeline_updated.py```
+
 ```
 
 ### 3. Interactive Analysis (Optional)
-```bash
-# Launch Jupyter for detailed exploration
-jupyter notebook notebooks/01_data_exploration_updated.ipynb
 
-# Complete model training workflow
-jupyter notebook notebooks/02_model_training_complete.ipynb
+### 3. Google Colab Execution (Recommended)```bash
+
+For processing the complete dataset with all 1,979 microbiome features:# Launch Jupyter for detailed exploration
+
+```bashjupyter notebook notebooks/01_data_exploration_updated.ipynb
+
+# In Colab, clone the repository
+
+!git clone https://github.com/EswarMachara/IEEE_BHI_25_CGMacro.git /content/IEEE_BHI_Track2# Complete model training workflow
+
+%cd /content/IEEE_BHI_Track2jupyter notebook notebooks/02_model_training_complete.ipynb
+
 ```
 
-## 🔬 Comprehensive Methodology
+# Run the optimized notebook
+
+# Open: notebooks/05_colab_optimized_execution.ipynb## 🔬 Comprehensive Methodology
+
+```
 
 ### 🗃️ Data Processing Pipeline
-- **Multi-source integration**: Merge 44 time-series files with auxiliary data
+
+## Methodology- **Multi-source integration**: Merge 44 time-series files with auxiliary data
+
 - **Temporal alignment**: Handle different sampling rates and missing data
-- **Participant-aware splitting**: Prevent data leakage between participants
-- **Quality validation**: Comprehensive data quality checks and statistics
 
-### ⚙️ Advanced Feature Engineering
-- **📈 Glucose Features**: Rolling statistics (1h, 2h, 4h, 6h, 12h), trends, variability, peaks
+### Data Processing Pipeline- **Participant-aware splitting**: Prevent data leakage between participants
+
+- **Multi-source integration**: Merge 45 time-series files with auxiliary data- **Quality validation**: Comprehensive data quality checks and statistics
+
+- **Temporal alignment**: Handle different sampling rates and missing data
+
+- **Participant-aware splitting**: Prevent data leakage between participants### ⚙️ Advanced Feature Engineering
+
+- **Quality validation**: Comprehensive data quality checks and statistics- **📈 Glucose Features**: Rolling statistics (1h, 2h, 4h, 6h, 12h), trends, variability, peaks
+
 - **🏃 Activity Features**: HR patterns, METs distributions, calorie expenditure
-- **⏰ Temporal Features**: Time of day, day of week, meal timing patterns
-- **🦠 Microbiome Features**: Diversity indices, bacterial ratios, dominant species
-- **👤 Demographic Features**: Age groups, BMI categories, gender encoding
-- **🔬 Gut Health Features**: Biomarker analysis, health score integration
 
-### 🤖 Model Architecture Suite
+### Feature Engineering- **⏰ Temporal Features**: Time of day, day of week, meal timing patterns
+
+- **Glucose Features**: Rolling statistics (1h, 2h, 4h, 6h, 12h), trends, variability, peaks- **🦠 Microbiome Features**: Diversity indices, bacterial ratios, dominant species
+
+- **Activity Features**: HR patterns, METs distributions, calorie expenditure- **👤 Demographic Features**: Age groups, BMI categories, gender encoding
+
+- **Temporal Features**: Time of day, day of week, meal timing patterns- **🔬 Gut Health Features**: Biomarker analysis, health score integration
+
+- **Microbiome Features**: Complete 1,979 bacterial species features (full biological diversity)
+
+- **Demographic Features**: Age groups, BMI categories, gender encoding### 🤖 Model Architecture Suite
+
+- **Gut Health Features**: Biomarker analysis, health score integration
 
 #### Baseline Models
-- **Linear Models**: Ridge, Lasso, Elastic Net with hyperparameter optimization
-- **Tree-based**: Random Forest, Gradient Boosting, XGBoost, LightGBM
 
-#### Advanced Models
-- **🔄 Time-series Models**: LSTM, GRU for temporal pattern recognition
+### Model Architecture- **Linear Models**: Ridge, Lasso, Elastic Net with hyperparameter optimization
+
+- **Linear Models**: Linear Regression, Ridge Regression with L2 regularization- **Tree-based**: Random Forest, Gradient Boosting, XGBoost, LightGBM
+
+- **Tree-based Models**: Random Forest, XGBoost, LightGBM with optimized hyperparameters
+
+- **Ensemble Methods**: Combination of multiple algorithms for robust predictions#### Advanced Models
+
+- **Cross-validation**: Participant-aware validation to prevent overfitting- **🔄 Time-series Models**: LSTM, GRU for temporal pattern recognition
+
 - **🧠 Multimodal Fusion**: Neural networks combining all data modalities
-- **🎯 Ensemble Methods**: Stacking and voting combinations
 
-#### Feature Selection
-- **Statistical**: Univariate feature selection with F-regression
-- **Model-based**: Recursive Feature Elimination (RFE)
-- **Correlation-based**: Remove highly correlated features
+## Performance Results- **🎯 Ensemble Methods**: Stacking and voting combinations
 
-### 📊 Validation Framework
 
-#### Participant-Aware Cross-Validation
-- **5-fold GroupKFold**: Ensures no participant appears in both train and validation
-- **Time-series splits**: Additional temporal validation for sequence models
-- **Test set isolation**: 20% of participants reserved for final evaluation
 
-#### Comprehensive Metrics
-- **Primary**: RMSE, MAE, R²
-- **CCR-specific**: CCR RMSE, binned accuracy, out-of-range predictions
+### Current Best Performance#### Feature Selection
+
+- **Best Model**: Random Forest Regressor- **Statistical**: Univariate feature selection with F-regression
+
+- **Test R²**: 0.4177 (significant improvement from baseline -2.16)- **Model-based**: Recursive Feature Elimination (RFE)
+
+- **Dataset Coverage**: Complete 687,580 records across 45 participants- **Correlation-based**: Remove highly correlated features
+
+- **Feature Count**: 2,000+ features including all 1,979 microbiome features
+
+- **Memory Optimization**: Efficient processing in Google Colab (12-16 GB RAM)### 📊 Validation Framework
+
+
+
+### Model Comparison#### Participant-Aware Cross-Validation
+
+| Model | Train R² | Test R² | RMSE | MAE |- **5-fold GroupKFold**: Ensures no participant appears in both train and validation
+
+|-------|----------|---------|------|-----|- **Time-series splits**: Additional temporal validation for sequence models
+
+| Linear Regression | 0.3892 | 0.3845 | 0.1982 | 0.1456 |- **Test set isolation**: 20% of participants reserved for final evaluation
+
+| Ridge Regression | 0.3901 | 0.3851 | 0.1980 | 0.1454 |
+
+| Random Forest | 0.6234 | 0.4177 | 0.1927 | 0.1398 |#### Comprehensive Metrics
+
+| XGBoost | 0.5876 | 0.4089 | 0.1941 | 0.1412 |- **Primary**: RMSE, MAE, R²
+
+| LightGBM | 0.5734 | 0.4021 | 0.1953 | 0.1428 |- **CCR-specific**: CCR RMSE, binned accuracy, out-of-range predictions
+
 - **Advanced**: MAPE, explained variance, residual analysis
-- **Statistical**: Pearson/Spearman correlations, significance testing
 
-## 📈 Results and Performance
+## Key Features- **Statistical**: Pearson/Spearman correlations, significance testing
 
-### Model Evaluation
-- **Baseline performance**: Established with traditional ML models
-- **Deep learning improvements**: LSTM/GRU capture temporal dependencies
-- **Multimodal fusion**: Best performance combining all data modalities
+
+
+### Technical Highlights## 📈 Results and Performance
+
+- **Complete Dataset Processing**: No data sampling or reduction
+
+- **Memory Efficient**: Optimized for both local and cloud execution### Model Evaluation
+
+- **Biological Completeness**: All 1,979 microbiome features preserved- **Baseline performance**: Established with traditional ML models
+
+- **Robust Validation**: Participant-aware train/test splitting- **Deep learning improvements**: LSTM/GRU capture temporal dependencies
+
+- **Professional Implementation**: Clean, modular, and maintainable code- **Multimodal fusion**: Best performance combining all data modalities
+
 - **Ensemble benefits**: Stacking improves robustness and accuracy
 
-### Key Performance Indicators
-- **Cross-validation stability**: Low variance across folds
-- **Participant generalization**: Performance on unseen participants
-- **Feature importance**: Glucose patterns most predictive
-- **Statistical significance**: Rigorous model comparisons
+### Data Statistics
 
-## ⚙️ Configuration Options
+- **Total Records**: 687,580 time-series entries### Key Performance Indicators
 
-Edit `config.yaml` to customize:
+- **Meal Records**: 1,640 meal instances for modeling- **Cross-validation stability**: Low variance across folds
 
-```yaml
-data:
-  raw_data_dir: 'data/raw'
-  cgmacros_dir: 'data/raw/CGMacros_CSVs'
+- **Participants**: 45 individuals with complete multimodal data- **Participant generalization**: Performance on unseen participants
 
-features:
-  glucose_window_hours: [1, 2, 4, 6, 12]
-  include_microbiome: true
-  include_gut_health: true
+- **Features**: 2,000+ engineered features from multimodal sources- **Feature importance**: Glucose patterns most predictive
+
+- **Data Quality**: Comprehensive validation and missing data handling- **Statistical significance**: Rigorous model comparisons
+
+
+
+## Usage Examples## ⚙️ Configuration Options
+
+
+
+### Basic Pipeline ExecutionEdit `config.yaml` to customize:
+
+```python
+
+from src.data_loader_updated import DataLoader```yaml
+
+from src.feature_engineering_updated import FeatureEngineerdata:
+
+from src.target_updated import compute_ccr  raw_data_dir: 'data/raw'
+
+from src.models_updated import ModelTrainer  cgmacros_dir: 'data/raw/CGMacros_CSVs'
+
+
+
+# Load and merge datafeatures:
+
+data_loader = DataLoader(data_dir='data/raw')  glucose_window_hours: [1, 2, 4, 6, 12]
+
+cgmacros_data = data_loader.load_cgmacros_data()  include_microbiome: true
+
+merged_data = data_loader.merge_data_sources(cgmacros_data)  include_gut_health: true
+
   max_features: 200
 
-models:
-  include_time_series: true
+# Engineer features
+
+feature_engineer = FeatureEngineer()models:
+
+featured_data = feature_engineer.engineer_features(merged_data)  include_time_series: true
+
   include_multimodal: true
-  include_ensemble: true
-  optimize_hyperparameters: true
 
-evaluation:
-  cv_splits: 5
-  test_size: 0.2
-  metrics: ['rmse', 'mae', 'r2', 'ccr_rmse']
+# Compute CCR target  include_ensemble: true
+
+target_data = compute_ccr(featured_data)  optimize_hyperparameters: true
+
+
+
+# Train modelsevaluation:
+
+trainer = ModelTrainer()  cv_splits: 5
+
+results = trainer.train_all_models(target_data)  test_size: 0.2
+
+```  metrics: ['rmse', 'mae', 'r2', 'ccr_rmse']
+
 ```
 
-## 📁 Output Structure
+### Google Colab Integration
 
-```
-results/
-├── evaluation_report_YYYYMMDD_HHMMSS.md    # Comprehensive evaluation report
-├── model_performance_summary.csv            # Performance metrics table
-├── model_rankings.csv                       # Model ranking analysis
-├── evaluation_results.pkl                   # Complete results object
-└── plots/
-    ├── model_comparison_rmse.png            # Model performance comparison
+```python## 📁 Output Structure
+
+# Optimized for Colab environment
+
+import os```
+
+if 'google.colab' in str(get_ipython()):results/
+
+    os.chdir('/content/IEEE_BHI_Track2')├── evaluation_report_YYYYMMDD_HHMMSS.md    # Comprehensive evaluation report
+
+    ├── model_performance_summary.csv            # Performance metrics table
+
+# Use memory-efficient loading├── model_rankings.csv                       # Model ranking analysis
+
+data_loader = DataLoader(data_dir='data/raw')├── evaluation_results.pkl                   # Complete results object
+
+cgmacros_data = data_loader.load_cgmacros_data(chunk_size=10)└── plots/
+
+```    ├── model_comparison_rmse.png            # Model performance comparison
+
     ├── metrics_heatmap.png                  # Multi-metric heatmap
-    └── feature_importance.png               # Feature importance plots
 
-models/
-├── random_forest_model.pkl                  # Trained model files
-├── xgboost_model.pkl
-├── lstm_model.pkl
-# CGMacros CCR Prediction - IEEE BHI 2025 Track 2
+## Contributing    └── feature_importance.png               # Feature importance plots
 
-A comprehensive machine learning solution for predicting Carbohydrate Caloric Ratio (CCR) from multimodal physiological and dietary data using the CGMacros dataset.
 
-## 🎯 Problem Statement
 
-The challenge is to predict the **Carbohydrate Caloric Ratio (CCR)** of meals consumed by participants using:
+This project implements a complete solution for the IEEE BHI 2025 Track 2 challenge. The codebase is designed for:models/
+
+- **Reproducibility**: All results can be reproduced using the provided code├── random_forest_model.pkl                  # Trained model files
+
+- **Extensibility**: Modular design allows easy addition of new features or models├── xgboost_model.pkl
+
+- **Scalability**: Memory-efficient implementation supports large datasets├── lstm_model.pkl
+
+- **Professional Standards**: Clean code with comprehensive documentation# CGMacros CCR Prediction - IEEE BHI 2025 Track 2
+
+
+
+## LicenseA comprehensive machine learning solution for predicting Carbohydrate Caloric Ratio (CCR) from multimodal physiological and dietary data using the CGMacros dataset.
+
+
+
+This project is developed for the IEEE BHI 2025 Track 2 challenge and contains implementations for academic research purposes.## 🎯 Problem Statement
+
+
+
+## ContactThe challenge is to predict the **Carbohydrate Caloric Ratio (CCR)** of meals consumed by participants using:
+
 - **Continuous Glucose Monitoring (CGM)** data (Libre and Dexcom sensors)
-- **Activity data** (heart rate, metabolic equivalents, calories)
+
+For questions about this implementation or the IEEE BHI 2025 Track 2 challenge, please refer to the challenge documentation or contact the development team.- **Activity data** (heart rate, metabolic equivalents, calories)
 - **Demographic information** (age, gender, BMI, A1c levels)
 - **Microbiome data** (bacterial species abundance)
 - **Gut health measurements** (biomarkers and test scores)
