@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # Project-specific
-data/raw/*.csv
+# data/raw/*.csv  # Commented out to allow auxiliary files
 data/processed/*.csv
 models/*.joblib
 models/*.pkl

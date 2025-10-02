@@ -202,7 +202,7 @@ class DataLoader:
         logger.info(f"Loaded demographics for {len(df)} participants")
         return df
     
-    def load_microbiome(self, max_features: int = 1000) -> pd.DataFrame:
+    def load_microbiome(self, max_features: int = None) -> pd.DataFrame:
         """
         Load microbiome composition data from microbes.csv with memory optimization for Colab.
         Contains abundance/presence data for thousands of microbial species.
@@ -212,7 +212,8 @@ class DataLoader:
         - Thousands of columns for different bacterial species (binary or abundance values)
         
         Args:
-            max_features: Maximum number of most prevalent microbial features to keep (default: 1000 for Colab)
+            max_features: Maximum number of most prevalent microbial features to keep 
+                         (None = use ALL features for maximum biological diversity)
         
         Returns:
             DataFrame with microbiome data for each participant
@@ -229,10 +230,10 @@ class DataLoader:
         if 'subject' in df.columns:
             df = df.rename(columns={'subject': 'participant_id'})
         
-        # Feature selection for microbiome data to reduce memory (keep more features for Colab)
+        # Feature selection for microbiome data (only if max_features is specified)
         microbiome_cols = [col for col in df.columns if col != 'participant_id']
         
-        if len(microbiome_cols) > max_features:
+        if max_features and len(microbiome_cols) > max_features:
             logger.info(f"Reducing microbiome features from {len(microbiome_cols)} to {max_features} most prevalent")
             
             # Calculate prevalence (non-zero values) for each microbial feature
@@ -241,6 +242,8 @@ class DataLoader:
             
             # Keep only top features plus participant_id
             df = df[['participant_id'] + top_features]
+        else:
+            logger.info(f"Using ALL {len(microbiome_cols)} microbiome features for maximum biological diversity")
             
         # Optimize dtypes
         df = self._optimize_dtypes(df)
@@ -305,8 +308,8 @@ class DataLoader:
             import gc
             gc.collect()
         
-        # Load and merge microbiome data (participant-level data with feature selection)
-        microbiome_df = self.load_microbiome(max_features=1000)  # Limit to top 1000 features for Colab
+        # Load and merge microbiome data (participant-level data with ALL 1979 features)
+        microbiome_df = self.load_microbiome()  # Use ALL microbiome features for maximum biological diversity
         if not microbiome_df.empty:
             merged_df = merged_df.merge(microbiome_df, on='participant_id', how='left')
             logger.info("Merged microbiome data")

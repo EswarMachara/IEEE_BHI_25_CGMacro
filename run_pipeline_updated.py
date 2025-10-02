@@ -110,7 +110,7 @@ class CGMacrosPipeline:
                 'include_microbiome': True,
                 'include_gut_health': True,
                 'include_temporal': True,
-                'max_features': 200
+                'max_features': 2000  # Increased to accommodate ALL 1979 microbiome features + others
             },
             'models': {
                 'include_baseline': True,
